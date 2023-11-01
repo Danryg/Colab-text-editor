@@ -4,8 +4,11 @@ const path = require('node:path')
 function createWindow () {
   const mainWindow = new BrowserWindow({
     webPreferences: {
-      preload: path.join(__dirname, 'preload.js')
+      preload: path.join(__dirname, 'preload.js'),
+      nodeIntegration: true,
+      contextIsolation: false,
     }
+    
   })
 
   
@@ -24,6 +27,9 @@ function handleSetTitle (event, title) {
     const win = BrowserWindow.fromWebContents(webContents)
     win.setTitle(title)
   }
+
+  
+
 
 app.whenReady().then(() => {
   ipcMain.on('set-title', handleSetTitle)
