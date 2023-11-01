@@ -7,6 +7,15 @@ import (
     "github.com/gorilla/websocket"
 )
 
+
+
+type file struct {
+    id   string
+    name string
+    path string
+}
+
+
 var upgrader = websocket.Upgrader{
     ReadBufferSize:  1024,
     WriteBufferSize: 1024,
@@ -38,6 +47,8 @@ func handleConnections(w http.ResponseWriter, r *http.Request) {
 	number = number + 1
 	uniqueID := fmt.Sprintf("%d", number)
 	clients[uniqueID] = conn
+
+    
 
     // Your application-specific logic for handling WebSocket messages
     go handleClient(conn, uniqueID)
