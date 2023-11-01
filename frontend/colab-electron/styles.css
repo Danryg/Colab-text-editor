@@ -1,0 +1,69 @@
+*{
+    margin: 0;
+    padding: 0;
+
+}
+
+
+#windo{
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    width: 100vw;
+
+}
+
+#header{
+    max-height: 50px;
+    max-width: 100%;
+    display: flex;
+    align-items: center;
+    flex-shrink: 1;
+    padding: 8px;
+}
+
+#header h2{
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+}
+
+
+#container{
+    max-width: 100%;
+    flex-grow: 4;
+    
+    display: flex;
+    flex-direction: row;
+
+    
+    border-radius: 8px;
+
+    padding: 8px;
+    gap: 8px;
+}
+#container #drawer{
+    
+    min-width: 50px;
+    border-radius: 5px;
+    flex-shrink: 1;
+    box-shadow: 0 0 10px 0 rgba(0,0,0,0.5);
+}
+
+#container #editor{
+    
+    border-radius: 5px;
+    flex-grow: 1;
+
+    box-shadow: 0 0 10px 0 rgba(0,0,0,0.5);
+    overflow: hidden;
+    padding: 8px;
+
+}
+
+#container #editor textarea {
+    width: 100%;
+    height: 100%;
+
+    outline-style: none;
+    border: none;
+    resize: none;
+}

@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <!-- https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'">
+    <link rel="stylesheet" type="text/css" href="styles.css">
+    <title>Hello World!</title>
+  </head>
+  <body>
+    <div id="windo">
+        <div id="header">
+            <h2>Collab Text editor</h2>
+        </div>
+        <div id="container">
+            <div id="drawer">
+            </div>
+            <div id="editor">
+                <textarea ></textarea >
+            </div>
+        </div>
+    </div>
+    <script src="./renderer.js"></script>
+  </body>
+</html>
