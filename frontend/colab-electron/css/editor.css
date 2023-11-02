@@ -1,0 +1,68 @@
+#container #editor {
+  flex-grow: 1;
+  border: #000000 1px solid;
+  overflow: hidden;
+  border-left: none;
+}
+
+#container #editor #editor_header {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  height: 25px;
+  padding: 8px;
+  border-bottom: #f7f7f5 2px solid;
+}
+
+#container #editor #editor_header h3#editor_header_title {
+  font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
+  font-size: 1.2rem;
+  font-weight: 500;
+  color: #000000;
+  margin: 0;
+  padding: 0;
+}
+
+#editor #editor_window {
+  display: flex;
+  flex-direction: column;
+  padding: 10px;
+
+  height: 100%;
+  width: 100%;
+}
+
+.editor_row {
+  display: flex;
+  flex-direction: row;
+  width: 95%;
+  min-height: 20px;
+  cursor: text;
+}
+
+.editor_row .editor_row_content {
+  display: none;
+  flex-grow: 1;
+}
+
+.editor_row.selected .editor_row_content {
+  display: block;
+}
+
+.editor_row .editor_row_markdown {
+  display: block;
+  flex-grow: 1;
+}
+
+.editor_row.selected .editor_row_markdown {
+  display: none;
+}
+
+#editor * {
+  font-family: "Lato";
+}
+
+#editor ol {
+  margin-left: 30px;
+}
