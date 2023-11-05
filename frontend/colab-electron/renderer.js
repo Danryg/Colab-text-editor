@@ -39,18 +39,30 @@ socket.onmessage = (event) => {
     } else if (tokens[0] == 2) {
     } else if (tokens[0] == 3) {
         const file = files.find(file => file.id === tokens[1]);
+        console.log("Updating file", file);
         file.content[tokens[2]] = tokens[3];
         if (currentFile && currentFile.id === file.id) {
             renderFile(file);
         }
+        currentFile = file;
+        console.log("Updated file", file);
     } else if (tokens[0] == 4) {
         const file = files.find(file => file.id === tokens[1]);
 
         console.log("Adding row to row", tokens[2]);
-        file.content.splice(tokens[2], 0, "");
+        file.content.splice(parseInt(tokens[2]) + 1, 0, "");
 
         if (currentFile && currentFile.id === file.id) {
             addRowSilent(parseInt(tokens[2]) + 1);
+        }
+    } else if (tokens[0] == 5) {
+        const file = files.find(file => file.id === tokens[1]);
+
+        console.log("Removing row from row", tokens[2]);
+        file.content.splice(tokens[2], 1);
+
+        if (currentFile && currentFile.id === file.id) {
+            removeRowSilent(parseInt(tokens[2]) );
         }
     } else {
         console.log("Unknown message type", tokens);
@@ -61,6 +73,7 @@ socket.onmessage = (event) => {
 
 
 const sendMessage = (message) => {
+    console.log(message);
     socket.send(message);
 
 }
@@ -181,6 +194,11 @@ const addRowSilent = (index) => {
     rowElement.addEventListener('keydown', keyDownEvent);
 }
 
+const removeRowSilent = (index) => {
+    console.log("Removing row at index", index);
+    editor.removeChild(editor.childNodes[index]);
+}
+
 
 const addNewRow = (index) => {
     const rowElement = createRowElement("");
@@ -195,6 +213,17 @@ const addNewRow = (index) => {
     });
     rowElement.querySelector('input').focus();
 }
+
+
+const signalRemoveRow = (index) => {
+    
+    console.log("Removing row at index", index);
+
+    let message = "5|&$" + currentFile.id + "|&$" + index;
+    sendMessage(message);
+
+}
+
 
 
 const keyDownEvent = (event) => {
@@ -214,6 +243,7 @@ const keyDownEvent = (event) => {
 
                 let index = Array.from(editor.childNodes).indexOf(activeRow);
                 editor.removeChild(activeRow);
+                signalRemoveRow(index)
                 if (index > 0) {
                     const upRow = editor.childNodes[index - 1];
 
