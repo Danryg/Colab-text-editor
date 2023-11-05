@@ -101,10 +101,28 @@ func broadcastComponentChange(conn *websocket.Conn, fileID string, componentNumb
             }
         }
     }
-        
+}
+
+
+func broadcastAddRow(conn *websocket.Conn, fileID string, row int, senderID string) {
+    typeByte := []byte("4")
+    message := append(typeByte, []byte("|&$")...)
+    message = append(message, []byte(fileID)...)
+    message = append(message, []byte("|&$")...)
+    message = append(message, []byte(strconv.Itoa(row))...)
+    
     
 
+    for clientID, conn := range clients {
+        if clientID != senderID{
+            err := conn.WriteMessage(websocket.TextMessage, message)
+            if(err != nil) {
+                fmt.Println("Error writing to socket: ", err)
+            }
+        }
+    }
 }
+
 
 
 func broadcastFiles(conn *websocket.Conn) {
@@ -178,17 +196,19 @@ func handleClient(conn *websocket.Conn, clientID string) {
             broadcastComponentChange(conn, tokens[1],num , tokens[3], clientID)
         } else if(tokens[0] == "4") {
             fmt.Println("add row: ")
+            num, err := strconv.Atoi(tokens[2])
+            if err != nil {
+                fmt.Println("Error converting string to int: ", err)
+            }
             for i, tempFile := range files {
                 if(tempFile.id == tokens[1]) {
-                    num, err := strconv.Atoi(tokens[2])
-                    if err != nil {
-                        fmt.Println("Error converting string to int: ", err)
-                    tempFile.components = append(tempFile.components, tokens[2])
+                    
+                    
+                    tempFile.components = append(tempFile.components[:num + 1], append([]string{""}, tempFile.components[num:]...)...)
                     files[i] = tempFile
                 }
             }
-            
-        
+            broadcastAddRow(conn, tokens[1], num, clientID)
         }
         fmt.Println("Message received: ", messageType)
         // Process the received message
