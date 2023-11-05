@@ -43,6 +43,15 @@ socket.onmessage = (event) => {
         if (currentFile && currentFile.id === file.id) {
             renderFile(file);
         }
+    } else if (tokens[0] == 4) {
+        const file = files.find(file => file.id === tokens[1]);
+
+        console.log("Adding row to row", tokens[2]);
+        file.content.splice(tokens[2], 0, "");
+
+        if (currentFile && currentFile.id === file.id) {
+            addRowSilent(parseInt(tokens[2]) + 1);
+        }
     } else {
         console.log("Unknown message type", tokens);
     }
@@ -114,6 +123,11 @@ const createFile = (name) => {
 }
 
 
+const addrow = (file, row) => {
+    let message = "4|&$" + file.id + "|&$" + row + "|&$";
+    sendMessage(message);
+}
+
 const updateFileContent = (file, component, content) => {
 
     file.content[component] = content;
@@ -126,17 +140,8 @@ const updateFileContent = (file, component, content) => {
 
 
 document.getElementById('test_button').addEventListener('click', () => {
-    updateFileContent(currentFile, 0, "test");
+    addrow(currentFile, 2);
 });
-
-
-const updateFile = () => {
-    let message = "2|&$" + currentFile.id + "|&$" + currentFile.name + "|&$";
-    currentFile.content.forEach(element => {
-        message += element + "|&$";
-    });
-    sendMessage(message);
-}
 
 
 const updateFiles = () => {
@@ -167,6 +172,15 @@ const updateFiles = () => {
 let activeRow = null;
 const editor = document.getElementById('editor_window');
 
+const addRowSilent = (index) => {
+    console.log("Adding row at index", index);
+    const rowElement = createRowElement("");
+    console.log("Adding row at index", rowElement);
+    console.log(editor);
+    editor.insertBefore(rowElement, editor.childNodes[index]);
+    rowElement.addEventListener('keydown', keyDownEvent);
+}
+
 
 const addNewRow = (index) => {
     const rowElement = createRowElement("");
@@ -182,15 +196,12 @@ const addNewRow = (index) => {
     rowElement.querySelector('input').focus();
 }
 
-const removeRow = (index) => {
-
-}
-
-
 
 const keyDownEvent = (event) => {
     if (event.key === 'Enter') {
         let index = Array.from(editor.childNodes).indexOf(activeRow);
+        console.log("Adding row at index", index);
+        addrow(currentFile, index);
         addNewRow(index + 1);
     } else if (event.key === 'Tab') {
         event.preventDefault();
