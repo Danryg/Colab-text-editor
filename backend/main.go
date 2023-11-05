@@ -149,6 +149,26 @@ func broadcastFiles(conn *websocket.Conn) {
 
 }
 
+func broadcastRemoveRow(conn *websocket.Conn, fileID string, row int, senderID string) {
+    typeByte := []byte("5")
+    message := append(typeByte, []byte("|&$")...)
+    message = append(message, []byte(fileID)...)
+    message = append(message, []byte("|&$")...)
+    message = append(message, []byte(strconv.Itoa(row))...)
+    
+    
+
+    for clientID, conn := range clients {
+        if clientID != senderID{
+            err := conn.WriteMessage(websocket.TextMessage, message)
+            if(err != nil) {
+                fmt.Println("Error writing to socket: ", err)
+            }
+        }
+    }
+}
+
+
 
 func handleClient(conn *websocket.Conn, clientID string) {
 	log.Printf("handleClient %s", clientID)
@@ -165,6 +185,7 @@ func handleClient(conn *websocket.Conn, clientID string) {
             delete(clients, clientID)
             return
         }
+        fmt.Printf("Message received: %s\n", p)
 
         fmt.Println(strings.Split(string(p), "|&$"))
         tokens := strings.Split(string(p), "|&$");
@@ -202,14 +223,30 @@ func handleClient(conn *websocket.Conn, clientID string) {
             }
             for i, tempFile := range files {
                 if(tempFile.id == tokens[1]) {
-                    
-                    
-                    tempFile.components = append(tempFile.components[:num + 1], append([]string{""}, tempFile.components[num:]...)...)
+                    tempFile.components = append(tempFile.components[:num + 1], append([]string{""}, tempFile.components[num + 1:]...)...)
                     files[i] = tempFile
                 }
             }
             broadcastAddRow(conn, tokens[1], num, clientID)
+        } else if(tokens[0] == "5") {
+            fmt.Println("delete row: ")
+            num, err := strconv.Atoi(tokens[2])
+            
+            if(err !=  nil) {
+                fmt.Println("Error converting string to int: ", err)
+                
+            }
+
+            for i, tempFile := range files {
+                if(tempFile.id == tokens[1]) {
+                    tempFile.components = append(tempFile.components[:num], tempFile.components[num + 1:]...)
+                    files[i] = tempFile
+                }
+            }
+            broadcastRemoveRow(conn, tokens[1], num, clientID)
         }
+
+
         fmt.Println("Message received: ", messageType)
         // Process the received message
         // Broadcast the message to all other clients
