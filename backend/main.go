@@ -7,6 +7,8 @@ import (
     "github.com/gorilla/websocket"
     "strings"
     "strconv"
+    "time"
+    "os"
 )
 
 
@@ -20,27 +22,8 @@ type file struct {
     path string
 }
 
+var files []file = []file{}
 
-var files = []file{
-    {
-        id: "1",
-        name: "file1",
-        components: []string{"Header 1", "This is some text", "fmt.Println(\"Hello, world!\")"},
-        path: "/path/to/file1",
-    },
-    {
-        id: "2",
-        name: "file2",
-        components: []string{"Header 2", "More text here", "fmt.Println(\"Another example\")"},
-        path: "/path/to/file2",
-    },
-    {
-        id: "3",
-        name: "file3",
-        components: []string{"Header 3", "Even more text", "fmt.Println(\"Last example\")"},
-        path: "/path/to/file3",
-    },
-}
 
 
 
@@ -259,10 +242,44 @@ func addFile(inFile file) {
 }
 
 
+func writeFilesToDisk() {
+    for _, file := range files {
+        content := strings.Join(file.components, "\n")
+        path := "fs/" + file.name
+        err := os.WriteFile(path, []byte(content), 0644)
+        if err != nil {
+            fmt.Println("Error writing to file:", err)
+        }
+    }
+}
+
 
 func main() {
     http.HandleFunc("/ws", handleConnections)
 
+    ticker := time.NewTicker(20 * time.Second)
+
+    files,err := os.ReadDir("fs")
+    if err != nil {
+        log.Fatal(err)
+    }
+    for _, tempFile := range files {
+        content, err := os.ReadFile("fs/" + tempFile.Name())
+        if err != nil {
+            fmt.Println("Error reading file:", err)
+        }
+        addFile(file{id: tempFile.Name(), name: tempFile.Name(), components: strings.Split(string(content), "\n")})
+    }
+
+
+    go func() {
+        for {
+            select {
+            case <-ticker.C:
+                writeFilesToDisk()
+            }
+        }
+    }()
     go func() {
         log.Fatal(http.ListenAndServe(":8080", nil))
     }()
